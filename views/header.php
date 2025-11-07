@@ -55,7 +55,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
     <div id="loader-wrapper"><div class="loader"><div class="text"><span>Loading</span></div><div class="text"><span>Loading</span></div><div class="text"><span>Loading</span></div><div class="text"><span>Loading</span></div><div class="text"><span>Loading</span></div><div class="text"><span>Loading</span></div><div class="text"><span>Loading</span></div><div class="text"><span>Loading</span></div><div class="text"><span>Loading</span></div><div class="line"></div></div></div>
 
-    <nav class="bg-white shadow-md sticky top-0 z-50">
+    <nav id="main-nav" class="bg-white shadow-md sticky top-0 z-50 transition-shadow duration-300">
         <div class="container mx-auto px-6 py-4">
             <div class="flex justify-between items-center">
                 <a href="index.php?action=landing" class="text-2xl font-bold flex items-center gap-2">
@@ -160,6 +160,25 @@ if (session_status() == PHP_SESSION_NONE) {
                 });
             }, { threshold: 0.1 });
             document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+            // Polished header: scroll-based box-shadow enhancement
+            const mainNav = document.getElementById('main-nav');
+            let lastScrollY = window.scrollY;
+            
+            const updateNavShadow = () => {
+                const currentScrollY = window.scrollY;
+                
+                if (currentScrollY > 20) {
+                    mainNav.style.boxShadow = '0 10px 30px rgba(44, 62, 80, 0.15)';
+                } else {
+                    mainNav.style.boxShadow = '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)';
+                }
+                
+                lastScrollY = currentScrollY;
+            };
+
+            window.addEventListener('scroll', updateNavShadow, { passive: true });
+            updateNavShadow();
         });
     </script>
 </body>
