@@ -54,55 +54,6 @@ $steps = $_POST['steps'] ?? array_map(function($step) { return $step['descriptio
 
 ?>
 
-<style>
-.step-input-group {
-    display: flex;
-    gap: 0.75rem;
-    align-items: flex-start;
-    animation: fadeIn 0.3s ease;
-}
-.step-input-group textarea {
-    flex-grow: 1;
-}
-.step-input-group .btn-remove-step {
-    flex-shrink: 0;
-    margin-top: 0.5rem;
-}
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-.title-validation-wrapper {
-    position: relative;
-}
-.title-validation-icon {
-    position: absolute;
-    top: 50%;
-    right: 0.85rem;
-    transform: translateY(-50%) scale(0.9);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-    pointer-events: none;
-}
-.title-validation-icon.active {
-    opacity: 1;
-    transform: translateY(-50%) scale(1);
-}
-.title-validation-icon svg {
-    width: 20px;
-    height: 20px;
-}
-.title-validation-icon--success svg {
-    fill: #27ae60;
-}
-.title-validation-icon--error svg {
-    fill: #dc2626;
-}
-</style>
-
 <div class="container mx-auto px-4 py-12">
     <div class="max-w-2xl mx-auto bg-white p-8 md:p-10 rounded-2xl shadow-lg">
         

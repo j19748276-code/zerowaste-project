@@ -2,43 +2,6 @@
 $pageTitle = htmlspecialchars($projet['titre']);
 require_once 'header.php'; 
 ?>
-<style>
- .step-item {
-     display: flex;
-     align-items: flex-start;
-     gap: 1.5rem;
-     padding: 1.5rem 0;
-     border-bottom: 1px solid #e5e7eb;
-     opacity: 0;
-     transform: translateY(32px);
-     transition: opacity 0.6s ease, transform 0.6s ease;
- }
- .step-item.is-visible {
-     opacity: 1;
-     transform: translateY(0);
- }
-.step-number {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 3rem;
-    height: 3rem;
-    border-radius: 50%;
-    background-color: #ecfdf5;
-    border: 2px solid #27ae60;
-    color: #27ae60;
-    font-size: 1.5rem;
-    font-weight: 700;
-    font-family: 'Ubuntu', sans-serif;
-}
-.step-content p {
-    color: #374151;
-    font-size: 1.1rem;
-    line-height: 1.7;
-}
-</style>
-
 <div class="container mx-auto px-6 py-12">
 
     <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">

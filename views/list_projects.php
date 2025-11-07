@@ -2,43 +2,6 @@
 $pageTitle = "Catalogue d'Upcycling";
 require_once 'header.php'; 
 ?>
-<style>
-.filter-btn {
-    padding: 0.5rem 1.25rem;
-    border-radius: 99px;
-    border: 1px solid #27ae60;
-    color: #27ae60;
-    background-color: white;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    cursor: pointer;
-}
-.filter-btn:hover {
-    background-color: #e8f5e9;
-    transform: translateY(-2px);
-}
-.filter-btn.active {
-    background-color: #27ae60;
-    color: white;
-    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
-}
-.project-card {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    transition: opacity 0.35s ease, transform 0.35s ease, filter 0.35s ease;
-    will-change: opacity, transform;
-}
-.project-card.filter-hidden {
-    opacity: 0;
-    transform: translateY(14px) scale(0.97);
-    filter: saturate(0.4);
-    pointer-events: none;
-}
-.project-card.hidden {
-    display: none;
-}
-</style>
-
 <div class="container mx-auto px-6 py-12">
 
     <header class="text-center mb-12 reveal">
