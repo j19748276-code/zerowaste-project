@@ -23,12 +23,34 @@ require_once 'header.php';
     box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
 }
 .project-card {
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), 
+                opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    max-height: 1000px;
+    overflow: hidden;
+}
+.project-card.hiding {
+    transform: scale(0.85);
+    opacity: 0;
+    max-height: 0;
+    margin: 0;
+    padding: 0;
 }
 .project-card.hidden {
-    transform: scale(0.9);
-    opacity: 0;
     display: none;
+}
+.project-card.showing {
+    animation: fadeInScale 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes fadeInScale {
+    0% {
+        opacity: 0;
+        transform: scale(0.85) translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
 </style>
 
@@ -126,22 +148,48 @@ document.addEventListener('DOMContentLoaded', function() {
         e.target.classList.add('active');
 
         let visibleCount = 0;
+        const cardsToShow = [];
+        const cardsToHide = [];
+
         projectCards.forEach(card => {
             const cardCategory = card.getAttribute('data-category-name');
             if (filterValue === 'all' || cardCategory === filterValue) {
-                card.classList.remove('hidden');
+                cardsToShow.push(card);
                 visibleCount++;
             } else {
-                card.classList.add('hidden');
+                cardsToHide.push(card);
             }
         });
 
+        // Animate cards out (fade out)
+        cardsToHide.forEach(card => {
+            card.classList.remove('showing');
+            card.classList.add('hiding');
+            setTimeout(() => {
+                card.classList.add('hidden');
+                card.classList.remove('hiding');
+            }, 500);
+        });
+
+        // Animate cards in (fade in) with staggered timing
+        cardsToShow.forEach((card, index) => {
+            card.classList.remove('hidden', 'hiding');
+            setTimeout(() => {
+                card.classList.add('showing');
+                setTimeout(() => {
+                    card.classList.remove('showing');
+                }, 600);
+            }, index * 80);
+        });
+
         if (noResultsMessage) {
-            if (visibleCount === 0) {
-                noResultsMessage.classList.remove('hidden');
-            } else {
-                noResultsMessage.classList.add('hidden');
-            }
+            setTimeout(() => {
+                if (visibleCount === 0) {
+                    noResultsMessage.classList.remove('hidden');
+                } else {
+                    noResultsMessage.classList.add('hidden');
+                }
+            }, 500);
         }
     });
 });

@@ -3,17 +3,79 @@ $pageTitle = "Catalogue d'Upcycling";
 require_once 'header.php'; 
 ?>
 <style>
-.hero-section { position: relative; color: white; overflow: hidden; }
-.hero-background { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=2070&auto=format&fit=crop'); background-size: cover; background-position: center; z-index: 1; }
+.hero-section { position: relative; color: white; overflow: hidden; min-height: 600px; }
+.hero-background { 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 120%; 
+    background-image: url('https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=2070&auto=format&fit=crop'); 
+    background-size: cover; 
+    background-position: center; 
+    z-index: 1;
+    transform: translateY(0);
+    transition: transform 0.5s ease-out;
+}
 .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(44, 62, 80, 0.8), rgba(44, 62, 80, 0.5)); z-index: 2; }
-.hero-content { position: relative; z-index: 3; }
-.feature-icon-card { text-align: center; padding: 2.5rem 2rem; background: white; border-radius: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #ecf0f1; transition: transform 0.3s ease, box-shadow 0.3s ease; }
-.feature-icon-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
-.feature-icon { display: inline-flex; align-items: center; justify-content: center; height: 70px; width: 70px; border-radius: 50%; background-color: #e8f5e9; margin-bottom: 1.5rem; transition: background-color 0.3s ease; }
-.feature-icon-card:hover .feature-icon { background-color: #27ae60; }
+.hero-content { 
+    position: relative; 
+    z-index: 3;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: heroFadeIn 1s ease-out 0.3s forwards;
+}
+@keyframes heroFadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.feature-icon-card { 
+    text-align: center; 
+    padding: 2.5rem 2rem; 
+    background: white; 
+    border-radius: 1rem; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+    border: 1px solid #ecf0f1; 
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+.feature-icon-card:hover { 
+    transform: translateY(-10px) rotateX(5deg); 
+    box-shadow: 0 20px 40px rgba(39, 174, 96, 0.15); 
+}
+.feature-icon { 
+    display: inline-flex; 
+    align-items: center; 
+    justify-content: center; 
+    height: 70px; 
+    width: 70px; 
+    border-radius: 50%; 
+    background-color: #e8f5e9; 
+    margin-bottom: 1.5rem; 
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform: scale(1);
+}
+.feature-icon-card:hover .feature-icon { 
+    background-color: #27ae60; 
+    transform: scale(1.1) rotateZ(5deg);
+}
 .feature-icon-card:hover .feature-icon svg { stroke: white; }
 .feature-icon svg { transition: stroke 0.3s ease; }
-.cta-section { background-image: linear-gradient(rgba(44, 62, 80, 0.85), rgba(44, 62, 80, 0.85)), url('https://images.unsplash.com/photo-1542601904-8241f061732d?q=80&w=1924&auto=format&fit=crop'); background-attachment: fixed; background-position: center; background-size: cover; }
+.cta-section { 
+    background-image: linear-gradient(135deg, rgba(39, 174, 96, 0.9), rgba(44, 62, 80, 0.9)), url('https://images.unsplash.com/photo-1542601904-8241f061732d?q=80&w=1924&auto=format&fit=crop'); 
+    background-attachment: fixed; 
+    background-position: center; 
+    background-size: cover;
+    animation: gradientShift 8s ease infinite;
+    background-size: 200% 200%;
+}
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
 
 /* --- New Carousel Styles --- */
 .carousel-container {
@@ -146,10 +208,44 @@ require_once 'header.php';
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // --- Parallax Effect for Hero Section ---
+    const heroBackground = document.querySelector('.hero-background');
+    
+    if (heroBackground) {
+        window.addEventListener('scroll', function() {
+            const scrolled = window.scrollY;
+            const parallaxSpeed = 0.5;
+            heroBackground.style.transform = `translateY(${scrolled * parallaxSpeed}px)`;
+        }, { passive: true });
+    }
+
+    // --- 3D Tilt Effect for Feature Cards ---
+    const featureCards = document.querySelectorAll('.feature-icon-card');
+    
+    featureCards.forEach(card => {
+        card.addEventListener('mousemove', function(e) {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            const rotateX = (y - centerY) / 10;
+            const rotateY = (centerX - x) / 10;
+            
+            card.style.transform = `translateY(-10px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            card.style.transform = 'translateY(0) rotateX(0) rotateY(0)';
+        });
+    });
+
+    // --- Carousel Auto-Scroll Logic ---
     const track = document.getElementById('carousel-track');
     if (!track) return;
 
-    // --- New Auto-Scroll Logic ---
     const slides = Array.from(track.children);
     if (slides.length === 0) return;
 
@@ -167,7 +263,6 @@ document.addEventListener('DOMContentLoaded', function() {
             totalWidth += slide.offsetWidth;
         });
 
-        // Set CSS variables for the animation
         const secondsPerSlide = 5; 
         const duration = slides.length * secondsPerSlide;
         
@@ -175,7 +270,6 @@ document.addEventListener('DOMContentLoaded', function() {
         track.style.setProperty('--scroll-duration', `${duration}s`);
     }
 
-    // Update on load and resize
     updateAnimationVariables();
     window.addEventListener('resize', updateAnimationVariables);
 });

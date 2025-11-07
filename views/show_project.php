@@ -9,6 +9,14 @@ require_once 'header.php';
     gap: 1.5rem;
     padding: 1.5rem 0;
     border-bottom: 1px solid #e5e7eb;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.step-item.visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 .step-number {
     flex-shrink: 0;
@@ -24,6 +32,21 @@ require_once 'header.php';
     font-size: 1.5rem;
     font-weight: 700;
     font-family: 'Ubuntu', sans-serif;
+    transition: transform 0.3s ease;
+}
+.step-item.visible .step-number {
+    animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+@keyframes popIn {
+    0% {
+        transform: scale(0);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
 }
 .step-content p {
     color: #374151;
@@ -119,6 +142,36 @@ require_once 'header.php';
     </div>
 
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Scroll-based animation for step-by-step instructions
+    const stepItems = document.querySelectorAll('.step-item');
+    
+    if (stepItems.length > 0) {
+        const observerOptions = {
+            threshold: 0.2,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const stepObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    // Add a slight delay for each step for a cascading effect
+                    setTimeout(() => {
+                        entry.target.classList.add('visible');
+                    }, index * 150);
+                    stepObserver.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        stepItems.forEach(step => {
+            stepObserver.observe(step);
+        });
+    }
+});
+</script>
 
 </body>
 </html>

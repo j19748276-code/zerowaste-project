@@ -72,6 +72,34 @@ $steps = $_POST['steps'] ?? array_map(function($step) { return $step['descriptio
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+.input-with-validation {
+    position: relative;
+}
+.validation-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.validation-icon.show {
+    opacity: 1;
+    animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+@keyframes bounceIn {
+    0% {
+        transform: translateY(-50%) scale(0);
+    }
+    50% {
+        transform: translateY(-50%) scale(1.2);
+    }
+    100% {
+        transform: translateY(-50%) scale(1);
+    }
+}
 </style>
 
 <div class="container mx-auto px-4 py-12">
@@ -98,7 +126,15 @@ $steps = $_POST['steps'] ?? array_map(function($step) { return $step['descriptio
             <div class="space-y-6">
                 <div>
                     <label for="titre" class="block text-sm font-medium text-gray-700 mb-1">Titre du Projet</label>
-                    <input type="text" id="titre" name="titre" value="<?= esc($val('titre')) ?>" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500" required minlength="3" aria-describedby="titreHelp">
+                    <div class="input-with-validation">
+                        <input type="text" id="titre" name="titre" value="<?= esc($val('titre')) ?>" class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500" required minlength="3" aria-describedby="titreHelp">
+                        <svg id="titre-valid" class="validation-icon" fill="none" viewBox="0 0 24 24" stroke="#10b981" stroke-width="3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <svg id="titre-invalid" class="validation-icon" fill="none" viewBox="0 0 24 24" stroke="#ef4444" stroke-width="3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </div>
                     <p id="titreHelp" class="mt-1 text-xs text-gray-500">Minimum 3 caractères.</p>
                 </div>
 
@@ -184,6 +220,37 @@ $steps = $_POST['steps'] ?? array_map(function($step) { return $step['descriptio
 
 <script>
 (function(){
+    // --- Real-time Form Validation for Title ---
+    const titreInput = document.getElementById('titre');
+    const validIcon = document.getElementById('titre-valid');
+    const invalidIcon = document.getElementById('titre-invalid');
+
+    const validateTitle = () => {
+        const value = titreInput.value.trim();
+        validIcon.classList.remove('show');
+        invalidIcon.classList.remove('show');
+        
+        if (value.length >= 3) {
+            validIcon.classList.add('show');
+        } else if (value.length > 0 && value.length < 3) {
+            invalidIcon.classList.add('show');
+        }
+    };
+
+    titreInput.addEventListener('keyup', validateTitle);
+    titreInput.addEventListener('blur', () => {
+        const value = titreInput.value.trim();
+        if (value.length > 0 && value.length < 3) {
+            invalidIcon.classList.add('show');
+            validIcon.classList.remove('show');
+        }
+    });
+
+    // Initial validation on page load
+    if (titreInput.value.trim().length >= 3) {
+        validIcon.classList.add('show');
+    }
+
     // --- Step Management ---
     const stepsContainer = document.getElementById('steps-container');
     const addStepBtn = document.getElementById('add-step-btn');
