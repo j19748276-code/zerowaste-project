@@ -3,13 +3,20 @@ $pageTitle = htmlspecialchars($projet['titre']);
 require_once 'header.php'; 
 ?>
 <style>
-.step-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 1.5rem;
-    padding: 1.5rem 0;
-    border-bottom: 1px solid #e5e7eb;
-}
+ .step-item {
+     display: flex;
+     align-items: flex-start;
+     gap: 1.5rem;
+     padding: 1.5rem 0;
+     border-bottom: 1px solid #e5e7eb;
+     opacity: 0;
+     transform: translateY(32px);
+     transition: opacity 0.6s ease, transform 0.6s ease;
+ }
+ .step-item.is-visible {
+     opacity: 1;
+     transform: translateY(0);
+ }
 .step-number {
     flex-shrink: 0;
     display: flex;
@@ -119,6 +126,27 @@ require_once 'header.php';
     </div>
 
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const stepItems = document.querySelectorAll('.step-item');
+    if (!stepItems.length) return;
+
+    const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                obs.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
+
+    stepItems.forEach((item, index) => {
+        item.style.transitionDelay = `${index * 120}ms`;
+        observer.observe(item);
+    });
+});
+</script>
 
 </body>
 </html>

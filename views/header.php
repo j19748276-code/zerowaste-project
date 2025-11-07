@@ -49,13 +49,30 @@ if (session_status() == PHP_SESSION_NONE) {
         .modal-overlay.active .modal-content { transform: scale(1); }
         .reveal { opacity: 0; transform: translateY(60px); transition: opacity 1s cubic-bezier(0.5, 0, 0, 1), transform 1s cubic-bezier(0.5, 0, 0, 1); }
         .reveal.visible { opacity: 1; transform: translateY(0); }
+          #main-navbar {
+              box-shadow: none;
+              transition: box-shadow 0.3s ease, background-color 0.3s ease;
+              background-color: rgba(255, 255, 255, 0.95);
+          }
+          #main-navbar.navbar-scrolled {
+              box-shadow: 0 12px 28px rgba(39, 174, 96, 0.18);
+              background-color: rgba(255, 255, 255, 0.98);
+          }
+          @supports (backdrop-filter: blur(6px)) {
+              #main-navbar {
+                  backdrop-filter: blur(0px);
+              }
+              #main-navbar.navbar-scrolled {
+                  backdrop-filter: blur(6px);
+              }
+          }
     </style>
 </head>
 <body class="antialiased">
 
     <div id="loader-wrapper"><div class="loader"><div class="text"><span>Loading</span></div><div class="text"><span>Loading</span></div><div class="text"><span>Loading</span></div><div class="text"><span>Loading</span></div><div class="text"><span>Loading</span></div><div class="text"><span>Loading</span></div><div class="text"><span>Loading</span></div><div class="text"><span>Loading</span></div><div class="text"><span>Loading</span></div><div class="line"></div></div></div>
 
-    <nav class="bg-white shadow-md sticky top-0 z-50">
+    <nav id="main-navbar" class="bg-white sticky top-0 z-50 transition duration-300">
         <div class="container mx-auto px-6 py-4">
             <div class="flex justify-between items-center">
                 <a href="index.php?action=landing" class="text-2xl font-bold flex items-center gap-2">
@@ -131,36 +148,47 @@ if (session_status() == PHP_SESSION_NONE) {
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const loader = document.getElementById('loader-wrapper');
-            window.addEventListener('load', () => {
-                loader.style.opacity = '0';
-                setTimeout(() => { loader.style.display = 'none'; }, 500);
-            });
-            const menuButton = document.getElementById('mobile-menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
-            menuButton.addEventListener('click', () => { mobileMenu.classList.toggle('hidden'); });
-            const modal = document.getElementById('confirmation-modal');
-            const cancelBtn = document.getElementById('cancel-delete-btn');
-            const confirmForm = document.getElementById('confirm-delete-form');
-            const deleteIdInput = document.getElementById('delete-id-input');
-            window.openConfirmationModal = (actionUrl, deleteId) => {
-                confirmForm.action = actionUrl;
-                deleteIdInput.value = deleteId;
-                modal.classList.add('active');
-            }
-            const closeModal = () => modal.classList.remove('active');
-            cancelBtn.addEventListener('click', closeModal);
-            modal.addEventListener('click', (e) => { if (e.target === modal) { closeModal(); } });
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
-                });
-            }, { threshold: 0.1 });
-            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-        });
+          document.addEventListener('DOMContentLoaded', () => {
+              const loader = document.getElementById('loader-wrapper');
+              window.addEventListener('load', () => {
+                  loader.style.opacity = '0';
+                  setTimeout(() => { loader.style.display = 'none'; }, 500);
+              });
+              const menuButton = document.getElementById('mobile-menu-button');
+              const mobileMenu = document.getElementById('mobile-menu');
+              menuButton.addEventListener('click', () => { mobileMenu.classList.toggle('hidden'); });
+              const modal = document.getElementById('confirmation-modal');
+              const cancelBtn = document.getElementById('cancel-delete-btn');
+              const confirmForm = document.getElementById('confirm-delete-form');
+              const deleteIdInput = document.getElementById('delete-id-input');
+              const mainNavbar = document.getElementById('main-navbar');
+              window.openConfirmationModal = (actionUrl, deleteId) => {
+                  confirmForm.action = actionUrl;
+                  deleteIdInput.value = deleteId;
+                  modal.classList.add('active');
+              };
+              const closeModal = () => modal.classList.remove('active');
+              cancelBtn.addEventListener('click', closeModal);
+              modal.addEventListener('click', (e) => { if (e.target === modal) { closeModal(); } });
+              const observer = new IntersectionObserver((entries) => {
+                  entries.forEach(entry => {
+                      if (entry.isIntersecting) {
+                          entry.target.classList.add('visible');
+                      }
+                  });
+              }, { threshold: 0.1 });
+              document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+              const toggleNavbarShadow = () => {
+                  if (!mainNavbar) return;
+                  if (window.scrollY > 20) {
+                      mainNavbar.classList.add('navbar-scrolled');
+                  } else {
+                      mainNavbar.classList.remove('navbar-scrolled');
+                  }
+              };
+              toggleNavbarShadow();
+              window.addEventListener('scroll', toggleNavbarShadow, { passive: true });
+          });
     </script>
 </body>
 </html>

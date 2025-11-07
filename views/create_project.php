@@ -88,6 +88,35 @@ function escAttr($s){ return htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8'); }
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+.title-validation-wrapper {
+    position: relative;
+}
+.title-validation-icon {
+    position: absolute;
+    top: 50%;
+    right: 0.85rem;
+    transform: translateY(-50%) scale(0.9);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+}
+.title-validation-icon.active {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+}
+.title-validation-icon svg {
+    width: 20px;
+    height: 20px;
+}
+.title-validation-icon--success svg {
+    fill: #27ae60;
+}
+.title-validation-icon--error svg {
+    fill: #dc2626;
+}
 </style>
 
 <div class="container mx-auto px-4 py-12">
@@ -114,7 +143,10 @@ function escAttr($s){ return htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8'); }
             <div class="space-y-6">
                 <div>
                     <label for="titre" class="block text-sm font-medium text-gray-700 mb-1">Titre du Projet</label>
-                    <input type="text" id="titre" name="titre" placeholder="Ex: Lampe à partir d'une bouteille" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500" required minlength="3" value="<?= escAttr($_POST['titre'] ?? '') ?>" aria-describedby="titreHelp">
+                    <div class="title-validation-wrapper">
+                        <input type="text" id="titre" name="titre" placeholder="Ex: Lampe à partir d'une bouteille" class="w-full px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500" required minlength="3" value="<?= escAttr($_POST['titre'] ?? '') ?>" aria-describedby="titreHelp">
+                        <span id="titreStatus" class="title-validation-icon" aria-hidden="true"></span>
+                    </div>
                     <p id="titreHelp" class="mt-1 text-xs text-gray-500">Minimum 3 caractères.</p>
                 </div>
 
@@ -181,6 +213,49 @@ function escAttr($s){ return htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8'); }
     // --- Step Management ---
     const stepsContainer = document.getElementById('steps-container');
     const addStepBtn = document.getElementById('add-step-btn');
+    const titleInput = document.getElementById('titre');
+    const titleStatus = document.getElementById('titreStatus');
+
+    const successSvg = `<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M8.292 13.708a1 1 0 0 1-1.414 0L3.88 10.71a1 1 0 1 1 1.414-1.414l2.293 2.292 6.119-6.118a1 1 0 0 1 1.414 1.414l-7.828 7.824z"/></svg>`;
+    const errorSvg = `<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 1.667a8.333 8.333 0 1 1 0 16.666 8.333 8.333 0 0 1 0-16.666zm2.357 4.643L10 8.667 7.643 6.31 6.31 7.643 8.667 10 6.31 12.357l1.333 1.333L10 11.333l2.357 2.357 1.333-1.333L11.333 10l2.357-2.357-1.333-1.333z"/></svg>`;
+
+    const updateTitleStatus = (state) => {
+        if (!titleStatus) return;
+        if (state === 'valid') {
+            titleStatus.innerHTML = successSvg;
+            titleStatus.classList.add('title-validation-icon--success', 'active');
+            titleStatus.classList.remove('title-validation-icon--error');
+        } else if (state === 'invalid') {
+            titleStatus.innerHTML = errorSvg;
+            titleStatus.classList.add('title-validation-icon--error', 'active');
+            titleStatus.classList.remove('title-validation-icon--success');
+        } else {
+            titleStatus.innerHTML = '';
+            titleStatus.classList.remove('title-validation-icon--success', 'title-validation-icon--error', 'active');
+        }
+    };
+
+    if (titleInput) {
+        const handleTitleKeyup = () => {
+            const length = titleInput.value.trim().length;
+            if (length >= 3) {
+                updateTitleStatus('valid');
+            } else if (titleStatus.classList.contains('title-validation-icon--error')) {
+                updateTitleStatus('invalid');
+            } else {
+                updateTitleStatus(null);
+            }
+        };
+
+        titleInput.addEventListener('keyup', handleTitleKeyup);
+        titleInput.addEventListener('blur', () => {
+            if (titleInput.value.trim().length < 3) {
+                updateTitleStatus('invalid');
+            }
+        });
+
+        handleTitleKeyup();
+    }
 
     const updateStepNumbers = () => {
         const stepGroups = stepsContainer.querySelectorAll('.step-input-group');

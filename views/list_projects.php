@@ -23,11 +23,18 @@ require_once 'header.php';
     box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
 }
 .project-card {
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    transition: opacity 0.35s ease, transform 0.35s ease, filter 0.35s ease;
+    will-change: opacity, transform;
+}
+.project-card.filter-hidden {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+    filter: saturate(0.4);
+    pointer-events: none;
 }
 .project-card.hidden {
-    transform: scale(0.9);
-    opacity: 0;
     display: none;
 }
 </style>
@@ -117,6 +124,42 @@ document.addEventListener('DOMContentLoaded', function() {
     const projectCards = document.querySelectorAll('.project-card');
     const noResultsMessage = document.getElementById('no-results-message');
 
+    const showCard = (card) => {
+        if (!card.classList.contains('hidden')) {
+            requestAnimationFrame(() => {
+                card.classList.remove('filter-hidden');
+            });
+            return;
+        }
+
+        card.classList.remove('hidden');
+        // Force style recalculation before removing the filter class
+        card.getBoundingClientRect();
+        requestAnimationFrame(() => {
+            card.classList.remove('filter-hidden');
+        });
+    };
+
+    const hideCard = (card) => {
+        if (card.classList.contains('hidden') || card.classList.contains('filter-hidden')) {
+            return;
+        }
+
+        card.classList.add('filter-hidden');
+
+        const onTransitionEnd = (event) => {
+            if (event.propertyName !== 'opacity') return;
+            if (!card.classList.contains('filter-hidden')) {
+                card.removeEventListener('transitionend', onTransitionEnd);
+                return;
+            }
+            card.classList.add('hidden');
+            card.removeEventListener('transitionend', onTransitionEnd);
+        };
+
+        card.addEventListener('transitionend', onTransitionEnd);
+    };
+
     filterBar.addEventListener('click', function(e) {
         if (!e.target.classList.contains('filter-btn')) return;
 
@@ -129,10 +172,10 @@ document.addEventListener('DOMContentLoaded', function() {
         projectCards.forEach(card => {
             const cardCategory = card.getAttribute('data-category-name');
             if (filterValue === 'all' || cardCategory === filterValue) {
-                card.classList.remove('hidden');
+                showCard(card);
                 visibleCount++;
             } else {
-                card.classList.add('hidden');
+                hideCard(card);
             }
         });
 
