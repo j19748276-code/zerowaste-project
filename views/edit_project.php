@@ -98,7 +98,19 @@ $steps = $_POST['steps'] ?? array_map(function($step) { return $step['descriptio
             <div class="space-y-6">
                 <div>
                     <label for="titre" class="block text-sm font-medium text-gray-700 mb-1">Titre du Projet</label>
-                    <input type="text" id="titre" name="titre" value="<?= esc($val('titre')) ?>" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500" required minlength="3" aria-describedby="titreHelp">
+                    <div class="relative">
+                        <input type="text" id="titre" name="titre" value="<?= esc($val('titre')) ?>" class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500" required minlength="3" aria-describedby="titreHelp">
+                        <div id="titre-validation-icon" class="absolute right-3 top-1/2 transform -translate-y-1/2 hidden">
+                            <!-- Green checkmark icon -->
+                            <svg id="titre-valid-icon" class="w-5 h-5 text-green-500 hidden" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <!-- Red X icon -->
+                            <svg id="titre-invalid-icon" class="w-5 h-5 text-red-500 hidden" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                    </div>
                     <p id="titreHelp" class="mt-1 text-xs text-gray-500">Minimum 3 caractères.</p>
                 </div>
 
@@ -184,6 +196,51 @@ $steps = $_POST['steps'] ?? array_map(function($step) { return $step['descriptio
 
 <script>
 (function(){
+    // --- Real-time Title Validation ---
+    const titreInput = document.getElementById('titre');
+    const validIcon = document.getElementById('titre-valid-icon');
+    const invalidIcon = document.getElementById('titre-invalid-icon');
+    const iconContainer = document.getElementById('titre-validation-icon');
+    
+    const validateTitle = () => {
+        const value = titreInput.value.trim();
+        
+        if (value.length >= 3) {
+            // Show green checkmark
+            validIcon.classList.remove('hidden');
+            invalidIcon.classList.add('hidden');
+            iconContainer.classList.remove('hidden');
+            titreInput.classList.remove('border-red-400');
+            titreInput.classList.add('border-green-400');
+        } else if (value.length > 0) {
+            // Show red X
+            validIcon.classList.add('hidden');
+            invalidIcon.classList.remove('hidden');
+            iconContainer.classList.remove('hidden');
+            titreInput.classList.add('border-red-400');
+            titreInput.classList.remove('border-green-400');
+        } else {
+            // Hide all icons when empty
+            iconContainer.classList.add('hidden');
+            titreInput.classList.remove('border-red-400', 'border-green-400');
+        }
+    };
+    
+    // Validate on keyup (as user types)
+    titreInput.addEventListener('keyup', validateTitle);
+    
+    // Validate on blur (when user clicks away)
+    titreInput.addEventListener('blur', () => {
+        const value = titreInput.value.trim();
+        if (value.length > 0 && value.length < 3) {
+            // Show red X if user leaves field with insufficient characters
+            validIcon.classList.add('hidden');
+            invalidIcon.classList.remove('hidden');
+            iconContainer.classList.remove('hidden');
+            titreInput.classList.add('border-red-400');
+        }
+    });
+
     // --- Step Management ---
     const stepsContainer = document.getElementById('steps-container');
     const addStepBtn = document.getElementById('add-step-btn');

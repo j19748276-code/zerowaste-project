@@ -9,6 +9,14 @@ require_once 'header.php';
     gap: 1.5rem;
     padding: 1.5rem 0;
     border-bottom: 1px solid #e5e7eb;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.step-item.animate-in {
+    opacity: 1;
+    transform: translateY(0);
 }
 .step-number {
     flex-shrink: 0;
@@ -119,6 +127,35 @@ require_once 'header.php';
     </div>
 
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Scroll-based animation for step items using IntersectionObserver
+    const stepItems = document.querySelectorAll('.step-item');
+    
+    if (stepItems.length > 0) {
+        const stepObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    // Add a slight delay for each step to create a staggered effect
+                    const stepDelay = Array.from(stepItems).indexOf(entry.target) * 150;
+                    setTimeout(() => {
+                        entry.target.classList.add('animate-in');
+                    }, stepDelay);
+                    stepObserver.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.2,
+            rootMargin: '0px 0px -50px 0px'
+        });
+        
+        stepItems.forEach(step => {
+            stepObserver.observe(step);
+        });
+    }
+});
+</script>
 
 </body>
 </html>

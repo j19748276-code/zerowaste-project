@@ -55,7 +55,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
     <div id="loader-wrapper"><div class="loader"><div class="text"><span>Loading</span></div><div class="text"><span>Loading</span></div><div class="text"><span>Loading</span></div><div class="text"><span>Loading</span></div><div class="text"><span>Loading</span></div><div class="text"><span>Loading</span></div><div class="text"><span>Loading</span></div><div class="text"><span>Loading</span></div><div class="text"><span>Loading</span></div><div class="line"></div></div></div>
 
-    <nav class="bg-white shadow-md sticky top-0 z-50">
+    <nav id="main-nav" class="bg-white shadow-md sticky top-0 z-50 transition-shadow duration-300">
         <div class="container mx-auto px-6 py-4">
             <div class="flex justify-between items-center">
                 <a href="index.php?action=landing" class="text-2xl font-bold flex items-center gap-2">
@@ -137,6 +137,22 @@ if (session_status() == PHP_SESSION_NONE) {
                 loader.style.opacity = '0';
                 setTimeout(() => { loader.style.display = 'none'; }, 500);
             });
+            
+            // Dynamic navigation shadow on scroll
+            const mainNav = document.getElementById('main-nav');
+            let lastScrollY = window.scrollY;
+            
+            const updateNavShadow = () => {
+                if (window.scrollY > 20) {
+                    mainNav.style.boxShadow = '0 10px 30px rgba(44, 62, 80, 0.15)';
+                } else {
+                    mainNav.style.boxShadow = '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)';
+                }
+                lastScrollY = window.scrollY;
+            };
+            
+            window.addEventListener('scroll', updateNavShadow, { passive: true });
+            
             const menuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
             menuButton.addEventListener('click', () => { mobileMenu.classList.toggle('hidden'); });

@@ -23,11 +23,20 @@ require_once 'header.php';
     box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
 }
 .project-card {
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    max-height: 1000px;
+    overflow: hidden;
+}
+.project-card.hiding {
+    transform: scale(0.85);
+    opacity: 0;
+    max-height: 0;
+    margin: 0;
+    padding: 0;
 }
 .project-card.hidden {
-    transform: scale(0.9);
-    opacity: 0;
     display: none;
 }
 </style>
@@ -126,15 +135,26 @@ document.addEventListener('DOMContentLoaded', function() {
         e.target.classList.add('active');
 
         let visibleCount = 0;
+        
+        // First pass: add 'hiding' class to cards that should be hidden
         projectCards.forEach(card => {
             const cardCategory = card.getAttribute('data-category-name');
             if (filterValue === 'all' || cardCategory === filterValue) {
-                card.classList.remove('hidden');
+                card.classList.remove('hiding', 'hidden');
                 visibleCount++;
             } else {
-                card.classList.add('hidden');
+                card.classList.add('hiding');
             }
         });
+        
+        // After animation completes, add 'hidden' class
+        setTimeout(() => {
+            projectCards.forEach(card => {
+                if (card.classList.contains('hiding')) {
+                    card.classList.add('hidden');
+                }
+            });
+        }, 400);
 
         if (noResultsMessage) {
             if (visibleCount === 0) {
